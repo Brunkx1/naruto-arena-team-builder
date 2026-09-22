@@ -1,4 +1,46 @@
 /*
+ * ============================================================================
+ *  EXPERIMENTO ENCERRADO — leia antes de mexer aqui / CLOSED EXPERIMENT
+ * ============================================================================
+ *
+ *  Este simulador NÃO alimenta as notas do programa. Foi medido em 2026-09-17
+ *  contra o winrate oficial (o único gabarito disponível) e deu correlação de
+ *  -0,13 — pior que sortear. Fica no repositório como registro do que foi
+ *  tentado, não como ferramenta.
+ *
+ *  POR QUE FALHOU
+ *  As mecânicas aqui são aproximadas a partir do TEXTO das habilidades, e o
+ *  texto não descreve as regras com a precisão que uma simulação exige. O
+ *  leitor (js/core/engine.js) erra ou ignora: acúmulos ("stacks"), cópia de skills,
+ *  manipulação de cooldown, condições de gatilho, ordem da fila de efeitos e
+ *  transformações que substituem habilidades. Num ranking essas falhas se
+ *  diluem; numa simulação turno a turno elas se multiplicam.
+ *
+ *  O QUE SERIA PRECISO PARA FUNCIONAR
+ *  1. Mecânicas curadas à mão, skill por skill (961 delas), num formato que a
+ *     máquina execute — não extraídas de texto.
+ *  2. Um motor fiel: ordem de fila, invulnerabilidade/counter/reflect,
+ *     defesa destrutível, aflição que ignora redução, economia de chakra.
+ *  3. Uma IA decente: a atual é gulosa (usa a skill de maior dano possível).
+ *     Um jogador ruim faz time bom parecer ruim, o que contamina tudo.
+ *  4. Validação partida a partida contra resultados reais. Isso hoje é
+ *     possível: o histórico do perfil dá "time A x time B -> vencedor"
+ *     (veja scripts/watch-matches.js). Era o que faltava em 2026-09-17.
+ *
+ *  Com (1) a (3) feitos e (4) mostrando que o simulador acerta o vencedor
+ *  acima do acaso, aí sim ele poderia voltar a alimentar as sugestões.
+ *
+ *  EN: this battle simulator is a closed experiment. Measured against the
+ *  official win rate it scored -0.13 (worse than chance), because its
+ *  mechanics are approximated from skill *text* and the text is not precise
+ *  enough for turn-by-turn simulation. Making it work would require
+ *  hand-curated mechanics for all 961 skills, a faithful engine, a decent AI,
+ *  and validation against real match outcomes (now collectable from the
+ *  profile match history).
+ * ============================================================================
+ */
+
+/*
  * Simulador - extração de efeitos executáveis a partir do texto de cada skill.
  *
  * Diferente do parser de notas (que agrega valores), aqui cada efeito vira um registro com valores brutos:
