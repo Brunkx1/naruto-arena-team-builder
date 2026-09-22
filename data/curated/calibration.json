@@ -1,0 +1,49 @@
+{
+  "_comentario": "Base de calibração: o que a comunidade/você sabe que é forte ou fraco. node scripts/calibrate.js mostra onde a heurística coloca cada item. Adicione casos aqui sempre que discordar do programa.",
+  "times": [
+    {
+      "membros": [
+        "Tenten",
+        "Nara Shikamaru",
+        "Temari"
+      ],
+      "esperado": "forte",
+      "fonte": "jogador (2026-09-17): time forte conhecido na era clássica; fórum: veterano diz que 'a estratégia ainda funciona'; winrate oficial individual ~42% (viés de tier)"
+    },
+    {
+      "membros": [
+        "Jiraiya",
+        "Hiruko Sasori (S)",
+        "Aburame Shino"
+      ],
+      "esperado": "forte",
+      "fonte": "jogador (2026-09-17): time que mais deu vitórias em sequência (conta de nível 26). Conceito: aflição + Gamabunta amplifica aflição do time"
+    },
+    {
+      "membros": [
+        "Inuzuka Kiba",
+        "Deidara (S)",
+        "Nara Shikamaru"
+      ],
+      "esperado": "forte",
+      "fonte": "jogador (2026-09-17): time usado para subir do nível 0 ao 26; 'dá para subir até o 31'. Conceito: bloqueio de esquiva (Shikamaru/Kiba) + área (Deidara/Kiba) + stun em área"
+    }
+  ],
+  "personagens": [
+    {
+      "nome": "Nara Shikamaru",
+      "esperado": "forte",
+      "fonte": "usuário: peça central de time forte"
+    },
+    {
+      "nome": "Tenten",
+      "esperado": "forte",
+      "fonte": "usuário"
+    },
+    {
+      "nome": "Temari",
+      "esperado": "forte",
+      "fonte": "usuário"
+    }
+  ]
+}
