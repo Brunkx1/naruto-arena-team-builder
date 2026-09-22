@@ -6,10 +6,23 @@
  */
 'use strict';
 const assert = require('assert');
+
+// Mensagem clara para quem acabou de clonar o projeto: os dados do jogo são baixados na primeira execução.
+function dadosFaltando(e) {
+  if (!/Cannot find module '\.\/data\//.test(String(e && e.message))) throw e;
+  console.error('\nOs dados do jogo ainda nao foram baixados. / The game data has not been downloaded yet.\n');
+  console.error('  node start.js               abre o programa e baixa tudo (personagens, missoes, patch notes)');
+  console.error('  node start.js --check-only  so baixa, sem abrir o navegador\n');
+  process.exit(1);
+}
+
 const E = require('./js/core/engine.js');
 const NM = require('./js/core/missions.js');
-const CHARS = require('./data/characters.js');
-const MISSIONS = require('./data/missions.js');
+let CHARS, MISSIONS;
+try {
+  CHARS = require('./data/characters.js');
+  MISSIONS = require('./data/missions.js');
+} catch (e) { dadosFaltando(e); }
 
 let passed = 0, failed = 0;
 function test(name, fn) {

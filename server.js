@@ -155,8 +155,7 @@ const PIPELINE_JOGO = [
   { fn: verificarVersao },
   { ...S('scripts/update-game-data.js'), se: seMudou },
   { ...S('scripts/download-patch-notes.js'), se: seMudou },
-  { ...S('scripts/validate-winrate.js'), se: seMudou },   // mede o erro típico...
-  { ...S('scripts/build-winrate.js'), se: seMudou },      // ...e o gerador grava essa margem no modelo
+  { ...S('scripts/build-winrate.js'), se: seMudou },      // gera o winrate e mede a própria margem de erro
   { ...S('scripts/build-community.js'), se: seMudou },
   { ...S('scripts/build-skills-db.js'), se: seMudou },
   { ...S('scripts/download-images.js'), se: seMudou },   // só baixa o que ainda não existe
