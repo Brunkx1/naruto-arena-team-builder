@@ -1,0 +1,50 @@
+MIT License
+
+Copyright (c) 2026 Brunkx1 (https://github.com/Brunkx1)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Additional condition — attribution / Condição adicional — crédito
+
+Personal use is unrestricted: run it, change it, break it, keep it to yourself.
+
+Any use beyond strictly personal use — publishing, distributing, hosting, or building something derived from
+this project — **must give visible credit to the original work and its author (Brunkx1)**, with a link to
+https://github.com/Brunkx1/naruto-arena-team-builder. "Visible" means where your users can see it: the page
+footer, the about screen, the README of your fork, or the description of your release. Removing or obscuring
+that credit is not permitted.
+
+---
+
+Uso pessoal é livre: rode, altere, quebre, guarde para você.
+
+Qualquer uso além do estritamente pessoal — publicar, distribuir, hospedar ou criar algo derivado deste
+projeto — **deve dar crédito visível ao trabalho original e ao seu autor (Brunkx1)**, com link para
+https://github.com/Brunkx1/naruto-arena-team-builder. "Visível" quer dizer onde os seus usuários vejam: o
+rodapé da página, a tela "sobre", o README do fork ou a descrição do lançamento. Remover ou esconder esse
+crédito não é permitido.
+
+---
+
+Naruto-Arena é um jogo de terceiros (https://www.naruto-arena.site). Este projeto
+não é afiliado ao jogo, não redistribui o conteúdo dele (personagens, habilidades,
+imagens) e apenas lê, na máquina de quem o usa, dados que o próprio jogo publica
+ou que pertencem à conta de quem está rodando o programa.

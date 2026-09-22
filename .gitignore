@@ -1,0 +1,42 @@
+# credenciais (nunca versionar)
+.env
+
+# dados da SUA conta e das suas partidas
+data/account.js
+data/account.raw.json
+data/accounts/
+data/results.js
+data/config.json
+
+# dados de outros jogadores (privacidade) e conteúdo do fórum
+data/ladder-teams.js
+data/forum.js
+
+# conteúdo do jogo: baixado na primeira execução, não redistribuído aqui
+data/characters.js
+data/characters.json
+data/missions.js
+data/news.js
+data/balance-history.js
+data/winrate.js
+data/winrate-pagina.js
+data/community.js
+data/skills-db.json
+data/skills-db.md
+data/img/
+data/version.json
+
+# resultados de análises (gerados por scripts/)
+data/synergy-model.json
+data/trained-weights.js
+data/sim-winrate.json
+data/winrate-validation.json
+data/site-map.json
+
+# lançador gerado pela própria máquina (caminhos absolutos)
+NA Team Builder.desktop
+NA Team Builder.vbs
+NA Team Builder.command
+
+# rascunho de contato com a staff (anotações pessoais)
+staff-contact.md

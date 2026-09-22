@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NA Team Builder</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1><span>NA</span> Team Builder</h1>
+    <span class="hint" data-i18n="tagline"></span>
+    <span id="account-chip" class="badge" style="display:none"></span>
+    <button id="observer-chip" class="badge obs" style="display:none" data-i18n-title="obs.chip.title"></button>
+    <nav>
+      <button data-tab="suggest" class="active" data-i18n="tab.suggest"></button>
+      <button data-tab="ranking" data-i18n="tab.ranking"></button>
+      <button data-tab="chars" data-i18n="tab.chars"></button>
+      <button data-tab="missions" data-i18n="tab.missions"></button>
+      <button data-tab="config" data-i18n="tab.config"></button>
+      <button data-tab="tools" id="tab-btn-tools"><span data-i18n="tab.tools"></span><span id="tools-dot" class="dot" style="display:none"></span></button>
+      <button id="lang-toggle" class="lang" data-i18n="lang.switch" data-i18n-title="lang.title"></button>
+    </nav>
+  </header>
+
+  <div id="banner" class="banner" style="display:none"><span id="banner-text"></span><button id="banner-reload" class="small primary" data-i18n="banner.reload"></button><button id="banner-close" class="small">✕</button></div>
+
+  <main>
+    <!-- ======================= SUGESTÕES ======================= -->
+    <section id="tab-suggest" class="tab active">
+      <div class="card guide" id="guide" style="margin-bottom:12px;display:none">
+        <button class="small" id="guide-close" style="float:right">✕</button>
+        <b data-i18n="guide.title"></b>
+        <ol>
+          <li data-i18n-html="guide.1"></li>
+          <li data-i18n-html="guide.2"></li>
+          <li data-i18n-html="guide.3"></li>
+        </ol>
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <h2 data-i18n="build.title"></h2>
+        <p class="hint" style="margin-top:-4px" data-i18n="build.hint"></p>
+        <div class="slots" id="slots"></div>
+        <div class="row opts">
+          <label data-i18n-title="opt.clash.title"><input type="checkbox" id="opt-clash"> <span data-i18n="opt.clash"></span></label>
+          <label data-i18n-title="opt.variants.title"><input type="checkbox" id="opt-variants"> <span data-i18n="opt.variants"></span></label>
+          <label data-i18n-title="opt.owned.title"><input type="checkbox" id="opt-owned"> <span data-i18n="opt.owned"></span></label>
+          <label data-i18n-title="opt.diverse.title"><input type="checkbox" id="opt-diverse" checked> <span data-i18n="opt.diverse"></span></label>
+          <label><span data-i18n="opt.pool"></span>
+            <select id="opt-pool">
+              <option value="60" data-i18n="opt.pool.fast"></option>
+              <option value="100" selected>Top 100</option>
+              <option value="150">Top 150</option>
+              <option value="216" data-i18n="opt.pool.all"></option>
+            </select>
+          </label>
+          <label><span data-i18n="opt.results"></span>
+            <select id="opt-limit">
+              <option value="10">10</option>
+              <option value="20" selected>20</option>
+              <option value="40">40</option>
+            </select>
+          </label>
+          <label data-i18n-title="opt.missions.title"><span data-i18n="opt.missions"></span>
+            <select id="opt-missions">
+              <option value="0" data-i18n="opt.missions.off"></option>
+              <option value="3" data-i18n="opt.missions.normal"></option>
+              <option value="8" data-i18n="opt.missions.high"></option>
+            </select>
+          </label>
+          <button class="primary" id="btn-suggest" data-i18n="btn.suggest"></button>
+          <button id="btn-clear" data-i18n="btn.clear"></button>
+          <span id="suggest-status" class="hint"></span>
+        </div>
+      </div>
+      <div class="row filters" id="teams-filter" style="display:none;margin:0 0 10px"></div>
+      <div class="teams" id="teams"></div>
+      <p class="hint" id="teams-empty" data-i18n="teams.empty"></p>
+      <div class="card" id="results-card" style="margin-top:12px;display:none">
+        <div class="row" style="margin-bottom:6px"><h2 style="margin:0" data-i18n="res.title"></h2><span class="hint" id="results-hint"></span></div>
+        <div id="results-list"></div>
+      </div>
+      <div class="card" id="ladder-card" style="margin-top:12px;display:none">
+        <div class="row" style="margin-bottom:6px">
+          <h2 style="margin:0" data-i18n="ladder.title"></h2>
+          <label style="margin-left:auto" data-i18n-title="ladder.owned.title"><input type="checkbox" id="ladder-owned"> <span data-i18n="ladder.owned"></span></label>
+        </div>
+        <p class="hint" id="ladder-hint"></p>
+        <div id="ladder-teams"></div>
+      </div>
+      <div class="card" id="community-card" style="margin-top:12px;display:none">
+        <div class="row" style="margin-bottom:6px">
+          <h2 style="margin:0" data-i18n="com.teams.title"></h2>
+          <label style="margin-left:auto" data-i18n-title="com.only.owned.title"><input type="checkbox" id="com-owned"> <span data-i18n="com.only.owned"></span></label>
+        </div>
+        <p class="hint" id="community-hint"></p>
+        <div id="community-teams"></div>
+      </div>
+    </section>
+
+    <!-- ======================= RANKING ======================= -->
+    <section id="tab-ranking" class="tab">
+      <div class="card" id="news-card" style="margin-bottom:12px;display:none">
+        <h2><span data-i18n="news.title"></span> <span class="hint" id="news-when" data-i18n="news.when"></span></h2>
+        <div id="news-list"></div>
+      </div>
+      <div class="card">
+        <div class="row" style="margin-bottom:10px">
+          <h2 style="margin:0" data-i18n="rank.title"></h2>
+          <input type="search" id="rank-search" data-i18n-placeholder="rank.search" style="margin-left:auto;min-width:240px">
+          <label data-i18n-title="rank.onlyMine.title"><input type="checkbox" id="rank-owned"> <span data-i18n="rank.onlyMine"></span></label>
+          <label data-i18n-title="wr.mode.title"><input type="checkbox" id="opt-wrmode"> <span data-i18n="wr.mode"></span></label>
+        </div>
+        <p class="hint" data-i18n="rank.hint2"></p>
+        <table id="rank-table">
+          <thead>
+            <tr>
+              <th data-sort="rank">#</th>
+              <th></th>
+              <th data-sort="name" data-i18n="th.name"></th>
+              <th data-sort="score" data-i18n="th.score"></th>
+              <th data-i18n="th.roles"></th>
+              <th data-sort="offense" data-i18n="th.dmg"></th>
+              <th data-sort="control" data-i18n="th.ctl"></th>
+              <th data-sort="defense" data-i18n="th.def"></th>
+              <th data-sort="support" data-i18n="th.sup"></th>
+              <th data-sort="economy" data-i18n="th.eco"></th>
+              <th data-i18n="th.chakra"></th>
+              <th data-i18n="th.tier"></th>
+              <th data-i18n="th.winrate" data-i18n-title="th.winrate.title"></th>
+              <th data-i18n="wr.vs"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ======================= PERSONAGENS ======================= -->
+    <section id="tab-chars" class="tab">
+      <div class="card">
+        <div class="row" style="margin-bottom:10px">
+          <h2 style="margin:0" data-i18n="chars.title"></h2>
+          <input type="search" id="chars-search" data-i18n-placeholder="chars.search" style="margin-left:auto;min-width:240px">
+          <select id="chars-filter">
+            <option value="all" data-i18n="chars.f.all"></option>
+            <option value="owned" data-i18n="chars.f.owned"></option>
+            <option value="notowned" data-i18n="chars.f.notowned"></option>
+            <option value="banned" data-i18n="chars.f.banned"></option>
+            <option value="tiered" data-i18n="chars.f.tiered"></option>
+          </select>
+          <button class="small" id="btn-own-account" data-i18n="chars.useAccount" data-i18n-title="chars.useAccount.title"></button>
+          <button class="small" id="btn-own-all" data-i18n="chars.ownAll"></button>
+          <button class="small" id="btn-own-none" data-i18n="chars.ownNone"></button>
+          <button class="small danger" id="btn-reset-chars" data-i18n="chars.reset"></button>
+        </div>
+        <p class="hint" data-i18n-html="chars.hint"></p>
+        <div class="grid" id="chars-grid"></div>
+      </div>
+    </section>
+
+    <!-- ======================= MISSÕES ======================= -->
+    <section id="tab-missions" class="tab">
+      <div class="card">
+        <div class="row" style="margin-bottom:10px">
+          <h2 style="margin:0" data-i18n="missions.title"></h2>
+          <span id="missions-summary" class="hint"></span>
+          <input type="search" id="missions-search" data-i18n-placeholder="missions.search" style="margin-left:auto;min-width:240px">
+          <select id="missions-filter">
+            <option value="disponivel" data-i18n="missions.f.available"></option>
+            <option value="prioridade" data-i18n="missions.f.priority"></option>
+            <option value="andamento" data-i18n="missions.f.progress"></option>
+            <option value="sequencia" data-i18n="missions.f.row"></option>
+            <option value="falta-rank" data-i18n="missions.f.rank"></option>
+            <option value="bloqueada" data-i18n="missions.f.locked"></option>
+            <option value="concluida" data-i18n="missions.f.done"></option>
+            <option value="all" data-i18n="missions.f.all"></option>
+          </select>
+          <select id="missions-anime"><option value="" data-i18n="missions.allAnime"></option></select>
+        </div>
+        <p class="hint" id="missions-hint"></p>
+        <p class="hint" id="missions-ranks"></p>
+        <div id="missions-list"></div>
+      </div>
+    </section>
+
+    <!-- ======================= CONFIGURAÇÕES ======================= -->
+    <section id="tab-config" class="tab">
+      <div class="card" style="margin-bottom:12px">
+        <h2 data-i18n="config.title"></h2>
+        <p class="hint" data-i18n="config.hint"></p>
+        <h3 data-i18n="config.char"></h3>
+        <div class="weights" id="weights-char"></div>
+        <h3 style="margin-top:14px" data-i18n="config.team"></h3>
+        <div class="weights" id="weights-team"></div>
+        <div class="row" style="margin-top:14px">
+          <button id="btn-weights-reset" data-i18n="config.reset"></button>
+          <span class="hint" data-i18n="config.storage"></span>
+        </div>
+        <p class="hint" id="trained-info" style="display:none;margin:10px 0 0"><label><input type="checkbox" id="opt-trained"> <span id="trained-text"></span></label></p>
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <h2 data-i18n="about.title"></h2>
+        <p class="hint" data-i18n-html="about.text"></p>
+      </div>
+      <div class="card">
+        <h2 data-i18n="config.how"></h2>
+        <ul class="hint" style="line-height:1.7">
+          <li data-i18n-html="how.wr"></li>
+          <li data-i18n-html="config.how.1"></li>
+          <li data-i18n-html="config.how.2"></li>
+          <li data-i18n-html="config.how.3"></li>
+          <li data-i18n-html="config.how.4"></li>
+          <li data-i18n-html="config.how.5"></li>
+          <li data-i18n-html="config.how.6"></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ======================= FERRAMENTAS (scripts sem terminal) ======================= -->
+    <section id="tab-tools" class="tab">
+      <div class="card" id="tools-offline" style="display:none">
+        <h2 data-i18n="tools.title"></h2>
+        <p class="hint" data-i18n-html="tools.offline"></p>
+      </div>
+      <div id="tools-online" style="display:none">
+        <div class="tools-grid">
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <h2 data-i18n="tools.login"></h2>
+              <p class="hint" data-i18n="tools.login.hint"></p>
+              <div class="row" style="margin-top:8px">
+                <input type="text" id="tools-user" autocomplete="username" data-i18n-placeholder="tools.user" style="width:160px">
+                <input type="password" id="tools-pass" autocomplete="current-password" data-i18n-placeholder="tools.pass" style="width:160px">
+                <label data-i18n-title="tools.save.title"><input type="checkbox" id="tools-save"> <span data-i18n="tools.save"></span></label>
+                <button class="small" id="tools-forget" style="display:none" data-i18n="tools.forget"></button>
+              </div>
+              <p class="hint" id="tools-login-status" style="margin:8px 0 0"></p>
+              <p class="hint" style="margin:8px 0 0"><label data-i18n-title="tools.autoobs.title"><input type="checkbox" id="tools-autoobs"> <span data-i18n="tools.autoobs"></span></label> <span data-i18n="tools.autoobs.hint"></span></p>
+              <p class="hint" style="margin:8px 0 0"><label data-i18n-title="tools.capture.title"><input type="checkbox" id="tools-capture"> <span data-i18n="tools.capture"></span></label> <span data-i18n="tools.capture.hint"></span></p>
+            </div>
+            <div id="tools-groups"></div>
+          </div>
+          <div class="card tools-log-card">
+            <div class="row" style="justify-content:space-between">
+              <b id="tools-log-title" data-i18n="tools.log"></b>
+              <span>
+                <button class="small" id="tools-log-clear" data-i18n="tools.log.clear"></button>
+                <button class="small danger" id="tools-quit" data-i18n="tools.quit" data-i18n-title="tools.quit.title"></button>
+              </span>
+            </div>
+            <pre id="tools-log" class="tools-log"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- modal: escolher personagem -->
+  <div class="modal-bg" id="picker-bg">
+    <div class="modal">
+      <div class="mhead">
+        <b data-i18n="picker.title"></b>
+        <input type="search" id="picker-search" data-i18n-placeholder="picker.search">
+        <button id="picker-close" data-i18n="picker.close"></button>
+      </div>
+      <div class="picker" id="picker-grid"></div>
+    </div>
+  </div>
+
+  <!-- modal: detalhe do personagem -->
+  <div class="modal-bg" id="detail-bg">
+    <div class="modal detail" id="detail-box"></div>
+  </div>
+
+  <script src="data/characters.js"></script>
+  <script src="data/missions.js"></script>
+  <script src="data/account.js"></script> <!-- dados da sua conta (opcional): gere com scripts/download-account.js -->
+  <script src="data/news.js"></script>    <!-- balanceamentos recentes: gerado por scripts/update-game-data.js -->
+  <script src="data/winrate.js"></script> <!-- winrate oficial: gere com scripts/build-winrate.js -->
+  <script src="data/skill-overrides.js"></script> <!-- correções manuais por skill -->
+  <script src="data/community.js"></script>       <!-- patch notes + fórum pré-computados (scripts/build-community.js) -->
+  <script src="data/trained-weights.js"></script>  <!-- pesos de time treinados (scripts/train-synergy.js --aplicar); null até treinar -->
+  <script src="data/img/index.js"></script>        <!-- imagens locais (scripts/download-images.js); sem ele a página usa o imgur -->
+  <script src="data/results.js"></script>       <!-- seus resultados (fontes cruas): gerado pelo observador / diário / baixar-conta -->
+  <script src="js/results.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/missions.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/tools.js"></script>   <!-- aba Ferramentas: fala com server.js quando aberto por start.js -->
+</body>
+</html>
