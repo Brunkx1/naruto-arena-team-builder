@@ -9,22 +9,26 @@
  */
 'use strict';
 const path = require('path');
-const W = require(path.join(__dirname, '..', 'data', 'winrate.js'));
-const MODEL = W._model || {};
-const EFFECT = MODEL.effect || { '-1': { a: 0, b: 0 }, '0': { a: 0, b: 0 }, '1': { a: 0, b: 0 } };
+let W = null; try { W = require(path.join(__dirname, '..', 'data', 'winrate.js')); } catch (e) { /* ainda não gerado */ }
 const dirOf = t => { const s = String(t || '').toLowerCase(); if (/nerf/.test(s)) return -1; if (/boost|buff/.test(s)) return 1; return 0; };
-const applyEffect = m => { const e = EFFECT[String(dirOf(m.type))] || { a: 0, b: 0 }; return m.winrate + e.a + e.b * m.winrate; };
 const months = (a, b) => (b - a) / (30 * 864e5);
 
-const series = [];
-for (const [name, v] of Object.entries(W)) {
-  if (name === '_model' || !v || !v.series) continue;
-  const arr = v.series.map(s => ({ ...s, ts: new Date(s.date).getTime() })).sort((a, b) => a.ts - b.ts);
-  if (arr.length >= 2) series.push({ name, arr, expected: v.expected != null ? v.expected : (MODEL.mean || 55) });
-}
+// Recebe o objeto de winrate (o mesmo que vira data/winrate.js) e devolve o erro típico da estimativa.
+// Fica em função para o gerador poder chamar direto, sem depender da ordem dos scripts.
+function avaliar(W) {
+  const MODEL = (W && W._model) || {};
+  const EFFECT = MODEL.effect || { '-1': { a: 0, b: 0 }, '0': { a: 0, b: 0 }, '1': { a: 0, b: 0 } };
+  const applyEffect = m => { const e = EFFECT[String(dirOf(m.type))] || { a: 0, b: 0 }; return m.winrate + e.a + e.b * m.winrate; };
 
-// estimadores (past = medições anteriores, da mais antiga para a mais nova)
-const EST = {
+  const series = [];
+  for (const [name, v] of Object.entries(W || {})) {
+    if (name === '_model' || !v || !v.series) continue;
+    const arr = v.series.map(s => ({ ...s, ts: new Date(s.date).getTime() })).sort((a, b) => a.ts - b.ts);
+    if (arr.length >= 2) series.push({ name, arr, expected: v.expected != null ? v.expected : (MODEL.mean || 55) });
+  }
+
+  // estimadores (past = medições anteriores, da mais antiga para a mais nova)
+  const EST = {
   'programa (atual)': (past, at, exp) => {
     const rec = ts => { const m = months(ts, at); return m < 6 ? 1 : m < 12 ? 0.8 : m < 24 ? 0.6 : 0.4; };
     let ws = 0, vs = 0;
@@ -44,7 +48,7 @@ const EST = {
   },
 };
 
-const names = Object.keys(EST);
+  const names = Object.keys(EST);
 const err = Object.fromEntries(names.map(n => [n, []]));
 const errFresh = Object.fromEntries(names.map(n => [n, []]));
 let cases = 0, fresh = 0;
@@ -62,8 +66,17 @@ const mae = a => a.reduce((s, x) => s + Math.abs(x), 0) / a.length;
 const bias = a => a.reduce((s, x) => s + x, 0) / a.length;
 const rmse = a => Math.sqrt(a.reduce((s, x) => s + x * x, 0) / a.length);
 const p = (a, q) => { const b = a.map(Math.abs).sort((x, y) => x - y); return b[Math.floor(q * (b.length - 1))]; };
-const best = names.slice().sort((a, b) => mae(err[a]) - mae(err[b]))[0];
-const out = { cases, fresh, generatedAt: new Date().toISOString(), best, typicalError: Math.round(mae(err['programa (atual)']) * 10) / 10, p90: Math.round(p(err['programa (atual)'], 0.9) * 10) / 10, bias: Math.round(bias(err['programa (atual)']) * 10) / 10 };
+  const best = names.slice().sort((a, b) => mae(err[a]) - mae(err[b]))[0];
+  const resumo = { cases, fresh, generatedAt: new Date().toISOString(), best, typicalError: Math.round(mae(err['programa (atual)']) * 10) / 10, p90: Math.round(p(err['programa (atual)'], 0.9) * 10) / 10, bias: Math.round(bias(err['programa (atual)']) * 10) / 10 };
+  return { resumo, err, names, errFresh, mae, bias, rmse, p };
+}
+
+module.exports = { avaliar };
+if (require.main !== module) return;   // usado como biblioteca pelo gerador
+
+if (!W) { console.error('data/winrate.js ainda não existe: rode "node start.js --check-only" primeiro.'); process.exit(0); }
+const { resumo: out, err, names, errFresh, mae, bias, rmse, p } = avaliar(W);
+const cases = out.cases, fresh = out.fresh, best = out.best;
 
 if (process.argv.includes('--json')) { console.log(JSON.stringify(out, null, 1)); process.exit(0); }
 console.log(`Previsão da próxima medição publicada: ${cases} casos (medições com 300+ partidas que têm alguma anterior)\n`);

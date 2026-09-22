@@ -96,9 +96,15 @@ try {
   // sem medição utilizável (< 200 partidas): a expectativa do tier de desbloqueio vira a nota-base (o motor mistura com a heurística)
   const expectedNoData = {};
   for (const c of CHARS) { const v = out[c.name]; if (!v || !(v.matches >= 200)) { const lvl = unlock.get(c.name) || 1; expectedNoData[c.name] = { unlockLevel: lvl, expected: Math.round((a + b * lvl) * 100) / 100 }; } }
-  let typicalError = null;
-  try { typicalError = require(path.join(DATA, 'winrate-validation.json')).typicalError; } catch (e) { /* rode scripts/validate-winrate.js */ }
-  out._model = { intercept: Math.round(a * 100) / 100, slope: Math.round(b * 1000) / 1000, mean: Math.round(my * 100) / 100, n, effect, expectedNoData, typicalError };
+  out._model = { intercept: Math.round(a * 100) / 100, slope: Math.round(b * 1000) / 1000, mean: Math.round(my * 100) / 100, n, effect, expectedNoData };
+  // margem de erro da estimativa, medida com o próprio histórico (prever cada medição com o que se sabia antes dela)
+  try {
+    const { resumo } = require('./validate-winrate.js').avaliar(out);
+    out._model.typicalError = resumo.typicalError;
+    out._model.errorP90 = resumo.p90;
+    fs.writeFileSync(path.join(DATA, 'winrate-validation.json'), JSON.stringify(resumo, null, 1));
+    console.log(`erro típico da estimativa: ±${resumo.typicalError} pontos (90% abaixo de ${resumo.p90}), em ${resumo.cases} casos`);
+  } catch (e) { console.warn('não consegui medir o erro típico:', e.message); }
   console.log(`sem medição utilizável: ${Object.keys(expectedNoData).length} personagens recebem a expectativa do tier (${Object.entries(expectedNoData).slice(0, 4).map(([k, v]) => `${k} ${v.expected}%`).join(', ')}...)`);
   console.log(`ajuste por tier: winrate ≈ ${a.toFixed(1)} + ${b.toFixed(2)} × nível de desbloqueio (n=${n}, média ${my.toFixed(1)}%)`);
 } catch (e) { console.warn('ajuste por tier não calculado:', e.message); }
