@@ -6,8 +6,8 @@
  */
 'use strict';
 const assert = require('assert');
-const E = require('./js/engine.js');
-const NM = require('./js/missions.js');
+const E = require('./js/core/engine.js');
+const NM = require('./js/core/missions.js');
 const CHARS = require('./data/characters.js');
 const MISSIONS = require('./data/missions.js');
 
@@ -263,7 +263,7 @@ test('"heals an ally for 25 points" conta como cura', () => {
 
 console.log('\n# Diário: consolidação dos resultados por time');
 {
-  const R = require('./js/results.js');
+  const R = require('./js/core/results.js');
   const team = ['A', 'B', 'C'];
   const agg = obs => R.aggregate({ observed: obs.map((o, i) => ({ at: '2026-09-2' + i + 'T10:00:00Z', team, type: 'ladder', ...o })) }).rows[0];
   test('registro que junta vitórias e derrotas conta as duas e não vira sequência', () => {
@@ -313,7 +313,7 @@ console.log('\n# Observador: histórico do perfil (fonte principal do resultado)
     assert.strictEqual(res.length, 2);
   });
   test('resultado do histórico alimenta o diário (vitórias, derrotas e sequência)', () => {
-    const R = require('./js/results.js');
+    const R = require('./js/core/results.js');
     const res = [];
     OB.mergeHistory(res, [g('c1', '2026-09-22T14:00:00Z', 'quick', 'win'), g('c2', '2026-09-22T14:05:00Z', 'quick', 'win'), g('c3', '2026-09-22T14:10:00Z', 'quick', 'lose')], () => ['A', 'B', 'C']);
     const row = R.aggregate({ observed: res }).rows[0];
@@ -357,10 +357,10 @@ console.log('\n# Observador: dedução de resultado de quick match pelas missõe
     await check('tarefa com login não roda sem credenciais', async () => { const r = srv.iniciarTarefa('conta', {}, null); assert.strictEqual(r.erro, 'sem-login'); });
     await check('correção de skill: personagem/skill desconhecidos são recusados sem gravar', async () => {
       const post = (body) => new Promise((res, rej) => { const r = http.request({ host: '127.0.0.1', port: P, method: 'POST', path: '/api/overrides', headers: { ...host, 'content-type': 'application/json' } }, x => { let d = ''; x.on('data', c => d += c); x.on('end', () => res({ status: x.statusCode, body: d })); }); r.on('error', rej); r.end(JSON.stringify(body)); });
-      const before = require('fs').statSync(require('path').join(__dirname, 'data', 'skill-overrides.js')).mtimeMs;
+      const before = require('fs').statSync(require('path').join(__dirname, 'data', 'curated', 'skill-overrides.js')).mtimeMs;
       assert.strictEqual((await post({ char: 'Ninguém', skill: 'x', override: { dmg: 1 } })).status, 400);
       assert.strictEqual((await post({ char: CHARS[0].name, skill: 'skill que não existe', override: { dmg: 1 } })).status, 400);
-      assert.strictEqual(require('fs').statSync(require('path').join(__dirname, 'data', 'skill-overrides.js')).mtimeMs, before);
+      assert.strictEqual(require('fs').statSync(require('path').join(__dirname, 'data', 'curated', 'skill-overrides.js')).mtimeMs, before);
     });
     await check('toda tarefa aponta para um script existente', async () => { for (const id of Object.keys(srv.TAREFAS)) for (const p of srv.TAREFAS[id].passos) if (p.script) assert(require('fs').existsSync(require('path').join(__dirname, p.script)), id + ': ' + p.script); });
     s.server.close();

@@ -10,7 +10,7 @@
  *              GET  /api/tarefas/<id>/log?desde=N    texto do log a partir do caractere N
  *              POST /api/login/salvar | /api/login/esquecer
  *              POST /api/config                      { observarAoAbrir, intervaloObservador } -> data/config.json
- *              POST /api/overrides                   { char, skill, override|null } -> data/skill-overrides.js
+ *              POST /api/overrides                   { char, skill, override|null } -> data/curated/skill-overrides.js
  *              POST /api/encerrar
  * Segurança: escuta só em 127.0.0.1; confere o cabeçalho Host; POSTs exigem Content-Type JSON (um site
  * qualquer aberto no navegador não consegue disparar as tarefas); nunca serve arquivos ocultos (.env).
@@ -75,8 +75,8 @@ function observerStats() {
 }
 const mtimeOf = file => { try { return Math.round(fs.statSync(file).mtimeMs); } catch (e) { return 0; } };
 
-// ---------------------------------------------------------------- correções manuais de skill (data/skill-overrides.js), editadas pela página
-const OV_FILE = path.join(ROOT, 'data', 'skill-overrides.js');
+// ---------------------------------------------------------------- correções manuais de skill (data/curated/skill-overrides.js), editadas pela página
+const OV_FILE = path.join(ROOT, 'data', 'curated', 'skill-overrides.js');
 const OV_NUM = ['dmg', 'dmgCond', 'stun', 'drain', 'debuff', 'heal', 'healAlly', 'dr', 'drAlly', 'dd', 'ddAlly', 'amplify', 'extendTurns', 'multiTurn', 'chakraGain'];
 const OV_BOOL = ['aoe', 'pierce', 'affliction', 'invulnSelf', 'invulnAlly', 'invulnTeam', 'counter', 'counterEnemy', 'reflect', 'uncounterable', 'ignoreInvuln', 'ignoreStun', 'cleanse', 'noDefense', 'noDefenseAoe', 'antiHeal', 'costUp', 'setup', 'free', 'invisible'];
 const OV_HEADER = `// Correções manuais do que o programa extraiu de cada skill. Têm a palavra final sobre o parser.

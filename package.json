@@ -1,0 +1,20 @@
+{
+  "name": "naruto-arena-team-builder",
+  "version": "1.0.0",
+  "description": "Local team builder for Naruto-Arena: ranks characters from the win rates the staff publishes, suggests trios, tracks missions and records real match results.",
+  "homepage": "https://github.com/Brunkx1/naruto-arena-team-builder",
+  "author": "Brunkx1 (https://github.com/Brunkx1)",
+  "license": "MIT WITH attribution-requirement (see LICENSE)",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node start.js",
+    "test": "node test.js",
+    "health": "node scripts/health-check.js",
+    "cli": "node cli.js"
+  },
+  "dependencies": {}
+}

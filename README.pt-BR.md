@@ -234,7 +234,7 @@ O jogo não expõe histórico de partidas para contas comuns, então o programa 
 - **Na página**: o card **Meus resultados** (aba Sugestões) mostra os mesmos números por time ao lado da nota
   que o programa dá ao trio, com "Usar"; cada time sugerido que você já jogou traz o badge *seu histórico:
   7V/0D · seq. 3*. Os dados vêm de `data/results.js`, regenerado pelo observador a cada partida, pelo diário
-  e por `download-account.js` (a consolidação é `js/results.js`, a mesma do diário).
+  e por `download-account.js` (a consolidação é `js/core/results.js`, a mesma do diário).
 - Snapshots de `download-account.js` também contam quando o time não mudou entre duas coletas.
 
 ### Treinar a regra de combinação (`scripts/train-synergy.js`)
@@ -325,7 +325,7 @@ comuns; só o staff pode liberar.
 
 ## Como funciona
 
-1. **Parser** (`js/engine.js › parseSkill`) lê a descrição em inglês de cada habilidade e extrai:
+1. **Parser** (`js/core/engine.js › parseSkill`) lê a descrição em inglês de cada habilidade e extrai:
    dano (com piercing/aflição/área/multi-turno/percentual), stun (com escopo por classe), roubo de chakra,
    redução de dano, defesa destrutível, cura, invulnerabilidade (total ou por classe), contra-ataque/reflexo,
    debuffs, manipulação de cooldown, stacks, reviver, quebra de defesa, cópia de skill, custo menor para o
@@ -342,7 +342,7 @@ comuns; só o staff pode liberar.
    qualquer tipo específico.
 5. **Busca**: avalia todas as combinações do pool (Top N por nota, ou todos os 216 = 1,6 milhão de trios
    em ~1-2 s), mantendo os melhores e diversificando para não repetir os mesmos 3 personagens.
-6. **Missões** (`js/missions.js`): as 200 missões e os 31 grupos (Team 7, Leaf Village...) foram extraídos
+6. **Missões** (`js/core/missions.js`): as 200 missões e os 31 grupos (Team 7, Leaf Village...) foram extraídos
    do bundle do site — a regra de cada objetivo é a mesma do jogo: basta *um* dos personagens listados
    (ou do grupo) no time; `sameTeam` exige todos; objetivos de "usar a skill X" exigem o dono da skill.
    A contagem por time usa bitmasks, então entra na busca combinatória sem custo perceptível.
@@ -389,7 +389,7 @@ relatório e podem ser corrigidas à mão pelo editor ✎.
 
 No detalhe do personagem, cada habilidade tem **✎ Corrigir leitura**: os números lidos (dano, stun, cura,
 reduções…) aparecem como sugestão e você preenche só o que está errado; as tags (área, perfurante,
-invulnerável, counter…) são marcadas/desmarcadas. Salvar grava em `data/skill-overrides.js` pelo servidor
+invulnerável, counter…) são marcadas/desmarcadas. Salvar grava em `data/curated/skill-overrides.js` pelo servidor
 local (o arquivo é reescrito com as correções ordenadas; a nota explica o porquê) e recalcula tudo na hora.
 Aberto pelo `file://`, o editor mostra o trecho JSON para colar no arquivo.
 
@@ -398,9 +398,9 @@ Aberto pelo `file://`, o editor mostra o trecho JSON para colar no arquivo.
 - `node scripts/build-skills-db.js` gera `data/skills-db.json` (um registro estruturado por skill) e
   `data/skills-db.md` (planilha de revisão: descrição + o que foi extraído). Ele lista as skills que o parser
   não entendeu.
-- `data/skill-overrides.js` — correções manuais por skill; têm a palavra final sobre o parser (ex.: mecânicas
+- `data/curated/skill-overrides.js` — correções manuais por skill; têm a palavra final sobre o parser (ex.: mecânicas
   de cooldown, cópia, "ignora todo o dano"). Editar uma linha ali corrige o personagem em todo o programa.
-- `data/calibration.json` + `node scripts/calibrate.js` — times e personagens conhecidos como fortes/fracos;
+- `data/curated/calibration.json` + `node scripts/calibrate.js` — times e personagens conhecidos como fortes/fracos;
   o script mostra onde a heurística os coloca. É o instrumento para ajustar pesos com evidência em vez de
   intuição: quanto mais casos, melhor.
 
@@ -409,7 +409,7 @@ Aberto pelo `file://`, o editor mostra o trecho JSON para colar no arquivo.
 A heurística de habilidades foi desenhada a partir do manual (terminologia de dano, stun, redução, aflição
 etc.) e calibrada manualmente. Ela vale para a parte de time e para quem não tem dados; a força individual
 vem do winrate oficial (seção acima). O "tier" do programa é o **seu**: um ajuste manual por personagem.
-Pesos em `js/engine.js › DEFAULT_WEIGHTS` e na aba Configurações.
+Pesos em `js/core/engine.js › DEFAULT_WEIGHTS` e na aba Configurações.
 
 ## Limitações honestas
 
@@ -421,7 +421,7 @@ Pesos em `js/engine.js › DEFAULT_WEIGHTS` e na aba Configurações.
   bloqueia versões alternativas no mesmo time (o cliente tem `alternativeVersionConflicts`), mas a lista
   exata fica no servidor; se algo passar ou for barrado indevidamente, use a opção "Permitir versões".
 - O peso por tipo de objetivo (sequência 3-4 / vencer N 0,6 / usar skill 0,3) é uma regra fixa em
-  `js/missions.js` (`goalWeight`), não vem de dados.
+  `js/core/missions.js` (`goalWeight`), não vem de dados.
 - O script da conta depende de detalhes internos do site (endpoints do Next.js, cabeçalhos `Origin`/`Referer`
   exigidos pelo `connect-selection`). Se o site mudar, rode com `--debug` (gera `data/account.raw.json`).
 - A página de winrate (`/characters-winrate`) é restrita: numa conta de nível baixo o site redireciona para a
@@ -430,61 +430,15 @@ Pesos em `js/engine.js › DEFAULT_WEIGHTS` e na aba Configurações.
 ## Estrutura
 
 ```
-index.html                  interface
-start.js                    lançador: sobe o servidor local, abre o navegador e verifica atualizações em segundo plano
-server.js                 servidor local (127.0.0.1): serve a página e executa os scripts para a aba Ferramentas
-test.js                     testes de regressão
-css/style.css
-js/engine.js                parser + notas + busca (funciona no navegador e no Node)
-js/i18n.js                  textos da interface em PT e EN
-js/app.js                   UI
-js/tools.js                 aba Ferramentas (fala com server.js)
-js/results.js            consolidação dos seus resultados por time (página, diário e observador)
-scripts/lib-results.js   gera data/results.js (fontes cruas) para a página
-cli.js                      linha de comando
-data/characters.json        dados brutos (fonte: naruto-arena.site/api/selection-catalog)
-data/characters.js          mesmos dados embutidos como JS (para abrir via file://)
-data/missions.js            200 missões + 31 grupos (extraídos do bundle do site)
-data/account.js             conta ativa (gerado por scripts/download-account.js)
-data/accounts/<user>.js     cópia por conta (troque com scripts/switch-account.js)
-data/news.js                últimos balanceamentos (gerado por scripts/update-game-data.js)
-data/version.json           versão do catálogo/build usada pelo start.js para detectar atualizações
-data/config.json            opções do programa (observador ao abrir, intervalo)
-data/img/                   imagens locais + index.js (URL -> arquivo), por scripts/download-images.js
-data/skills-db.json / .md   base estruturada por skill + planilha de revisão (scripts/build-skills-db.js)
-data/skill-overrides.js     correções manuais por skill (palavra final sobre o parser)
-data/calibration.json        casos conhecidos (times/personagens fortes ou fracos) para scripts/calibrate.js
-data/trained-weights.js     pesos de time treinados (scripts/train-synergy.js --aplicar); null até treinar
-data/winrate.js             winrate oficial por personagem (scripts/build-winrate.js)
-data/balance-history.js     113 patch notes com mudanças e winrate por personagem (scripts/download-patch-notes.js)
-data/forum.js               tópicos/posts do fórum (scripts/download-forum.js, login)
-data/community.js           nerfs/buffs, menções e trios recomendados pré-computados (scripts/build-community.js)
-js/meta.js                  classificação nerf/buff, resolução de apelidos, extração de trios do fórum
-js/missions.js              casamento missão x time, pesos por objetivo, cadeia de pré-requisitos, prioridade
-js/sim/effects.js, battle.js  simulador de batalha (experimento; não alimenta as notas)
-scripts/simulate.js          torneio IA×IA e correlação com o winrate oficial
-scripts/watch-matches.js         observador: ladder pelos contadores, quick match deduzido pelo progresso das missões
-scripts/diary.js           resumo dos seus resultados por time (vitórias, derrotas, sequência máxima)
-scripts/train-synergy.js treina os pesos de time com trios rotulados (fórum / seus resultados)
-scripts/create-launcher.js     gera o lançador "NA Team Builder.desktop/.vbs/.command" dentro da pasta (abrir sem terminal)
-NA Team Builder.desktop     lançador (Linux): duplo clique abre o programa sem terminal
-scripts/update-game-data.js  atualiza personagens e missões a partir do site (sem login)
-scripts/download-images.js   baixa retratos, ícones de skill e imagens de missão para data/img/
-scripts/validate-winrate.js  mede o erro típico da estimativa de winrate e compara fórmulas alternativas
-scripts/validate-chakra.js   testa se o formato do custo de chakra explica força (deu ~0: nada é penalizado)
-scripts/skill-coverage.js compara o texto de cada habilidade com o que o parser extraiu
-scripts/health-check.js  confere todas as fontes de dados de uma vez (roda ao abrir o programa)
-scripts/map-site.js      lista todas as páginas do site e o que cada uma devolve (acha fontes de dados novas)
-scripts/collect-ladder-teams.js    times salvos + resultados de jogadores da ladder -> data/ladder-teams.js
-data/site-map.json          resultado do mapeamento do site (22 páginas com dados, 35 restritas)
-scripts/download-account.js     baixa personagens liberados, perfil, status e progresso das missões (login)
-scripts/switch-account.js     alterna entre contas já baixadas
-scripts/download-patch-notes.js  baixa os patch notes com winrate oficial (público)
-scripts/build-winrate.js  consolida as medições em data/winrate.js
-scripts/download-forum.js     baixa o fórum oficial (login)
-scripts/build-community.js pré-computa o sinal de comunidade para a interface
-scripts/calibrate.js         mede a heurística contra o winrate oficial e a base de calibração
-scripts/download-winrate-page.js   tenta a página de winrate do site (restrita para contas comuns)
+start.js              lançador: sobe o servidor local, abre o navegador e verifica atualizações do jogo
+server.js             servidor local (127.0.0.1): serve a página e roda os scripts da aba Ferramentas
+cli.js, test.js       linha de comando e os 97 testes de regressão
+js/core/              motor (leitor de habilidades, notas, busca de times), missões, patch notes, resultados
+js/ui/                só navegador: interface, textos PT/EN, aba Ferramentas
+js/sim/               simulador de batalha — experimento encerrado, explicado no comentário do arquivo
+scripts/              um arquivo por tarefa: download-*, build-*, validate-*, watch-matches, health-check…
+data/curated/         conhecimento humano que vem no repositório: correções de skill, casos de calibração
+data/                 todo o resto é baixado na primeira execução e nunca versionado
 ```
 
 ## Fontes

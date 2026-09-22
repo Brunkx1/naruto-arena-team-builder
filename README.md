@@ -142,9 +142,21 @@ node cli.js sugerir --n 10         # same engine from the command line
 node scripts/health-check.js    # checks every data source still parses
 ```
 
-No build step, no dependencies. `js/engine.js` (parser + scoring + team search) works both in the browser and
-in Node; `server.js` is a ~300-line local server that serves the page and runs the scripts behind the Tools
-tab. The repository ships code only — game data and personal data are downloaded locally and never committed.
+No build step, no dependencies.
+
+```
+start.js              launcher: starts the local server, opens the browser, checks for game updates
+server.js             local server (127.0.0.1): serves the page and runs the scripts behind the Tools tab
+cli.js, test.js       command line and the 97 regression tests
+js/core/              engine (skill parser, scoring, team search), missions, patch notes, results
+js/ui/                browser only: interface, PT/EN strings, Tools tab
+js/sim/               battle simulator — closed experiment, documented in its header comment
+scripts/              one file per task: download-*, build-*, validate-*, watch-matches, health-check…
+data/curated/         human knowledge that ships with the repo: skill corrections, calibration cases
+data/                 everything else is downloaded on first run and never committed
+```
+
+`js/core/engine.js` runs both in the browser and in Node, which is why the CLI and the UI always agree.
 
 ## Roadmap
 

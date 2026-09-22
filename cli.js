@@ -14,8 +14,8 @@
  * Portuguese command names still work (sugerir, time, detalhe, missoes, comunidade), as do the old flags.
  */
 'use strict';
-const E = require('./js/engine.js');
-const NM = require('./js/missions.js');
+const E = require('./js/core/engine.js');
+const NM = require('./js/core/missions.js');
 const CHARS = require('./data/characters.js');
 const MISSIONS = require('./data/missions.js');
 let ACCOUNT = null;
@@ -46,7 +46,7 @@ for (let i = 0; i < args.length; i++) {
   else opt._ = (opt._ || []).concat(a);
 }
 
-try { E.setOverrides(require('./data/skill-overrides.js')); } catch (e) { /* sem correções */ }
+try { E.setOverrides(require('./data/curated/skill-overrides.js')); } catch (e) { /* sem correções */ }
 let TRAINED = null;
 try { TRAINED = require('./data/trained-weights.js'); } catch (e) { /* opcional */ }
 if (TRAINED && !opt.semTreinados) E.setTrainedWeights(TRAINED);   // pesos de time treinados (scripts/train-synergy.js --aplicar)
@@ -132,7 +132,7 @@ if (cmd === 'ranking') {
     const scoreByName = new Map(profiles.map(p => [p.name, p.score]));
     // taxa real: melhor time seu (5+ partidas decididas) que avança a missão, em vez dos 55% fixos
     let agg = null;
-    try { const RES = require('./data/results.js'); if (RES && ACCOUNT && RES.username && RES.username.toLowerCase() === ACCOUNT.username.toLowerCase()) agg = require('./js/results.js').aggregate(RES); } catch (e) { /* sem resultados */ }
+    try { const RES = require('./data/results.js'); if (RES && ACCOUNT && RES.username && RES.username.toLowerCase() === ACCOUNT.username.toLowerCase()) agg = require('./js/core/results.js').aggregate(RES); } catch (e) { /* sem resultados */ }
     const pFor = (mi, g) => {
       if (!agg) return null;
       let best = null;
